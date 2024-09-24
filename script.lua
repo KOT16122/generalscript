@@ -35,6 +35,31 @@ local function findCorrectDoor(doors)
     return correctDoor, minDistance
 end
 
+-- Функция для подсветки двери зелёным
+local function highlightDoor(door)
+    if door and door.PrimaryPart then
+        -- Сбрасываем подсветку для всех частей двери
+        for _, part in pairs(door:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.BrickColor = BrickColor.new("Bright green")  -- Подсвечиваем зеленым
+                part.Material = Enum.Material.Neon  -- Используем неон для подсветки
+            end
+        end
+    end
+end
+
+-- Функция для сброса подсветки
+local function resetDoorHighlight(door)
+    if door and door.PrimaryPart then
+        for _, part in pairs(door:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.BrickColor = BrickColor.new("Medium stone grey")  -- Стандартный цвет двери
+                part.Material = Enum.Material.Plastic  -- Обычный материал
+            end
+        end
+    end
+end
+
 -- Функция для отображения информации на экране
 local function displayDoorInfo(door, distance)
     -- Очищаем предыдущие GUI объекты
@@ -56,13 +81,23 @@ local function displayDoorInfo(door, distance)
     infoLabel.Text = "Правильная дверь: " .. door.Name .. "\nРасстояние: " .. math.floor(distance) .. " метров"
 end
 
--- Основная логика
-local doors = findDoors()
-if #doors > 0 then
-    local correctDoor, distance = findCorrectDoor(doors)
-    if correctDoor then
-        displayDoorInfo(correctDoor, distance)
+-- Основная функция, которая обновляет подсветку и информацию
+local function updateDoors()
+    while true do
+        local doors = findDoors()
+        if #doors > 0 then
+            local correctDoor, distance = findCorrectDoor(doors)
+            if correctDoor then
+                -- Подсветить правильную дверь и обновить информацию
+                highlightDoor(correctDoor)
+                displayDoorInfo(correctDoor, distance)
+            end
+        else
+            warn("Двери не найдены!")
+        end
+        wait(1)  -- Обновляем информацию и подсветку каждую секунду
     end
-else
-    warn("Двери не найдены!")
 end
+
+-- Запуск основного цикла
+updateDoors()
