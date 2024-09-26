@@ -1,27 +1,40 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
 
--- Функция для выделения двери зеленым цветом
-local function highlightDoor(door)
-    local highlight = Instance.new("Highlight")  -- Создаем новый объект Highlight
-    highlight.Adornee = door  -- Указываем, на что будет действовать Highlight
-    highlight.FillColor = Color3.new(0, 1, 0)  -- Зеленый цвет
-    highlight.FillTransparency = 0.5  -- Прозрачность
-    highlight.Parent = door  -- Добавляем Highlight к двери
-end
+local flying = false
+local speed = 50
 
--- Функция для поиска и выделения всех дверей
-local function findDoors()
-    while true do
-        for _, obj in pairs(workspace:GetChildren()) do
-            if obj:IsA("Part") and obj.Name == "Door" then
-                highlightDoor(obj)  -- Выделяем дверь
-            end
-        end
-        wait(1)  -- Пауза между проверками
+local bodyVelocity = Instance.new("BodyVelocity")
+bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+
+local function fly()
+    flying = true
+    bodyVelocity.Parent = character.HumanoidRootPart
+
+    while flying do
+        local camera = workspace.CurrentCamera
+        local direction = camera.CFrame.LookVector
+
+        bodyVelocity.Velocity = direction * speed + Vector3.new(0, 20, 0)
+        wait(0.1)
     end
+
+    bodyVelocity.Parent = nil
 end
 
--- Запускаем поиск дверей
-findDoors()
+local function stopFlying()
+    flying = false
+end
+
+-- Привязываем функции к клавишам
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.F then
+        if not flying then
+            fly()
+        else
+            stopFlying()
+        end
+    end
+end)
