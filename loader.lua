@@ -1,65 +1,61 @@
-local httpService = game:GetService("HttpService")
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local HttpService = game:GetService("HttpService")
 
--- Замените на ваш URL для проверки ключа
-local KEY_CHECK_URL = "https://997b-87-117-51-159.ngrok-free.app/check-key"
-local MAIN_SCRIPT_URL = "https://raw.githubusercontent.com/KOT16122/generalscript/main/script.lua"  -- Замените на URL основного скрипта
+-- URL для API проверки ключа
+local API_URL = "https://997b-87-117-51-159.ngrok-free.app/check-key"
 
 -- Создание GUI
-local screenGui = Instance.new("ScreenGui", playerGui)
-local frame = Instance.new("Frame", screenGui)
-frame.Size = UDim2.new(0.5, 0, 0.5, 0)
-frame.Position = UDim2.new(0.25, 0, 0.25, 0)
-frame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local KeyBox = Instance.new("TextBox")
+local CheckButton = Instance.new("TextButton")
+local OutputLabel = Instance.new("TextLabel")
 
-local keyInput = Instance.new("TextBox", frame)
-keyInput.Size = UDim2.new(0.8, 0, 0.2, 0)
-keyInput.Position = UDim2.new(0.1, 0, 0.2, 0)
-keyInput.BackgroundColor3 = Color3.new(1, 1, 1)
-keyInput.PlaceholderText = "Введите ваш ключ"
+-- Настройка элементов GUI
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local checkButton = Instance.new("TextButton", frame)
-checkButton.Size = UDim2.new(0.5, 0, 0.2, 0)
-checkButton.Position = UDim2.new(0.25, 0, 0.5, 0)
-checkButton.BackgroundColor3 = Color3.new(0, 0.5, 0)
-checkButton.Text = "Проверить ключ"
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0, 300, 0, 200)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+KeyBox.Parent = Frame
+KeyBox.Size = UDim2.new(1, 0, 0, 50)
+KeyBox.Position = UDim2.new(0, 0, 0, 20)
+KeyBox.PlaceholderText = "Введите ваш ключ"
+
+CheckButton.Parent = Frame
+CheckButton.Size = UDim2.new(1, 0, 0, 50)
+CheckButton.Position = UDim2.new(0, 0, 0, 80)
+CheckButton.Text = "Проверить ключ"
+
+OutputLabel.Parent = Frame
+OutputLabel.Size = UDim2.new(1, 0, 0, 50)
+OutputLabel.Position = UDim2.new(0, 0, 0, 140)
+OutputLabel.Text = ""
 
 -- Функция для проверки ключа
 local function checkKey(key)
     local success, response = pcall(function()
-        return httpService:PostAsync(KEY_CHECK_URL, httpService:JSONEncode({key = key}), Enum.HttpContentType.ApplicationJson)
+        return HttpService:PostAsync(API_URL, HttpService:JSONEncode({key = key}), Enum.HttpContentType.ApplicationJson)
     end)
 
     if success then
-        local data = httpService:JSONDecode(response)
-        return data.status == "success"
+        local result = HttpService:JSONDecode(response)
+        return result.status == "success"
     else
-        warn("Ошибка при проверке ключа: " .. tostring(response))
         return false
     end
 end
 
--- Функция для загрузки основного скрипта
-local function loadMainScript()
-    local success, response = pcall(function()
-        return httpService:GetAsync(MAIN_SCRIPT_URL)
-    end)
-
-    if success then
-        loadstring(response)()  -- Выполняет основной скрипт
+-- Обработка нажатия кнопки
+CheckButton.MouseButton1Click:Connect(function()
+    local key = KeyBox.Text
+    if checkKey(key) then
+        OutputLabel.Text = "Ключ действителен! Загружаю скрипт..."
+        -- Загрузка основного скрипта
+        local mainScriptUrl = "URL_TO_YOUR_MAIN_SCRIPT" -- Замените на фактический URL вашего основного скрипта
+        loadstring(game:HttpGet(mainScriptUrl))()
     else
-        warn("Ошибка при загрузке основного скрипта: " .. tostring(response))
-    end
-end
-
--- Обработчик события нажатия кнопки
-checkButton.MouseButton1Click:Connect(function()
-    local userKey = keyInput.Text
-    if checkKey(userKey) then
-        print("Ключ действителен. Загружаю основной скрипт...")
-        loadMainScript()
-    else
-        print("Недействительный ключ. Доступ к скрипту запрещен.")
+        OutputLabel.Text = "Недействительный ключ!"
     end
 end)
