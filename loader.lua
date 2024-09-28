@@ -53,7 +53,7 @@ CheckButton.MouseButton1Click:Connect(function()
     if checkKey(key) then
         OutputLabel.Text = "Ключ действителен! Загружаю скрипт..."
         -- Загрузка основного скрипта
-        local mainScriptUrl = "URL_TO_YOUR_MAIN_SCRIPT" -- Замените на фактический URL вашего основного скрипта
+        local mainScriptUrl = "https://raw.githubusercontent.com/KOT16122/generalscript/main/script.lua" -- Замените на фактический URL вашего основного скрипта
         loadstring(game:HttpGet(mainScriptUrl))()
     else
         OutputLabel.Text = "Недействительный ключ!"
