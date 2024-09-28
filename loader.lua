@@ -4,7 +4,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 
 -- Замените на ваш URL для проверки ключа
 local KEY_CHECK_URL = "https://997b-87-117-51-159.ngrok-free.app/check-key"
-local MAIN_SCRIPT_URL = "https://example.com/main_script.lua"  -- Замените на URL основного скрипта
+local MAIN_SCRIPT_URL = "https://raw.githubusercontent.com/KOT16122/generalscript/main/script.lua"  -- Замените на URL основного скрипта
 
 -- Создание GUI
 local screenGui = Instance.new("ScreenGui", playerGui)
