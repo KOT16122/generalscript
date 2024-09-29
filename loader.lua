@@ -46,7 +46,7 @@ TextButton.MouseButton1Click:Connect(function()
         StatusLabel.Text = "Ключ действителен! Загружаем скрипт..."
         
         -- Здесь вставьте код скрипта, который нужно загрузить
-        local scriptToLoad = "https://raw.githubusercontent.com/ваш_скрипт/main.lua"  -- Замените на URL вашего скрипта
+        local scriptToLoad = "https://raw.githubusercontent.com/KOT16122/generalscript/main/script.lua"  -- Замените на URL вашего скрипта
         loadstring(game:HttpGet(scriptToLoad))()
     else
         StatusLabel.Text = "Неверный ключ."
