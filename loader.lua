@@ -1,61 +1,54 @@
-local HttpService = game:GetService("HttpService")
-
--- URL для API проверки ключа
-local API_URL = "https://997b-87-117-51-159.ngrok-free.app/check-key"
-
 -- Создание GUI
 local ScreenGui = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
-local KeyBox = Instance.new("TextBox")
-local CheckButton = Instance.new("TextButton")
-local OutputLabel = Instance.new("TextLabel")
+local TextBox = Instance.new("TextBox")
+local TextButton = Instance.new("TextButton")
+local StatusLabel = Instance.new("TextLabel")
 
--- Настройка элементов GUI
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
+-- Настройки GUI
+ScreenGui.Parent = game.CoreGui
 Frame.Parent = ScreenGui
-Frame.Size = UDim2.new(0, 300, 0, 200)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
-Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Frame.Size = UDim2.new(0.5, 0, 0.5, 0)
+Frame.Position = UDim2.new(0.25, 0, 0.25, 0)
 
-KeyBox.Parent = Frame
-KeyBox.Size = UDim2.new(1, 0, 0, 50)
-KeyBox.Position = UDim2.new(0, 0, 0, 20)
-KeyBox.PlaceholderText = "Введите ваш ключ"
+TextBox.Parent = Frame
+TextBox.Size = UDim2.new(1, 0, 0.2, 0)
+TextBox.PlaceholderText = "Введите ключ"
 
-CheckButton.Parent = Frame
-CheckButton.Size = UDim2.new(1, 0, 0, 50)
-CheckButton.Position = UDim2.new(0, 0, 0, 80)
-CheckButton.Text = "Проверить ключ"
+TextButton.Parent = Frame
+TextButton.Size = UDim2.new(1, 0, 0.2, 0)
+TextButton.Position = UDim2.new(0, 0, 0.25, 0)
+TextButton.Text = "Проверить ключ"
 
-OutputLabel.Parent = Frame
-OutputLabel.Size = UDim2.new(1, 0, 0, 50)
-OutputLabel.Position = UDim2.new(0, 0, 0, 140)
-OutputLabel.Text = ""
+StatusLabel.Parent = Frame
+StatusLabel.Size = UDim2.new(1, 0, 0.2, 0)
+StatusLabel.Position = UDim2.new(0, 0, 0.5, 0)
+StatusLabel.Text = ""
 
 -- Функция для проверки ключа
 local function checkKey(key)
-    local success, response = pcall(function()
-        return HttpService:PostAsync(API_URL, HttpService:JSONEncode({key = key}), Enum.HttpContentType.ApplicationJson)
-    end)
+    local HttpService = game:GetService("HttpService")
+    local url = "https://f6b1-87-117-51-159.ngrok-free.app/check-key"  -- Замените на ваш URL
+    local data = HttpService:JSONEncode({key = key})
 
-    if success then
-        local result = HttpService:JSONDecode(response)
-        return result.status == "success"
-    else
-        return false
-    end
+    local response = HttpService:PostAsync(url, data, Enum.HttpContentType.ApplicationJson)
+    return HttpService:JSONDecode(response)
 end
 
--- Обработка нажатия кнопки
-CheckButton.MouseButton1Click:Connect(function()
-    local key = KeyBox.Text
-    if checkKey(key) then
-        OutputLabel.Text = "Ключ действителен! Загружаю скрипт..."
-        -- Загрузка основного скрипта
-        local mainScriptUrl = "https://raw.githubusercontent.com/KOT16122/generalscript/main/script.lua" -- Замените на фактический URL вашего основного скрипта
-        loadstring(game:HttpGet(mainScriptUrl))()
+-- Обработчик нажатия кнопки
+TextButton.MouseButton1Click:Connect(function()
+    local key = TextBox.Text
+    StatusLabel.Text = "Проверка ключа..."
+
+    local result = checkKey(key)
+
+    if result.status == "success" then
+        StatusLabel.Text = "Ключ действителен! Загружаем скрипт..."
+        
+        -- Здесь вставьте код скрипта, который нужно загрузить
+        local scriptToLoad = "https://raw.githubusercontent.com/ваш_скрипт/main.lua"  -- Замените на URL вашего скрипта
+        loadstring(game:HttpGet(scriptToLoad))()
     else
-        OutputLabel.Text = "Недействительный ключ!"
+        StatusLabel.Text = "Неверный ключ."
     end
 end)
